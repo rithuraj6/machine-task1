@@ -1,55 +1,100 @@
-
 # Infrastructure Architecture
 
-## Hypervisor
+## 1. Hypervisor
 
-Oracle VM VirtualBox
+- Oracle VM VirtualBox 7.2.22
+- VM management: VirtualBox Manager and VBoxManage
+- Virtual disk: dynamically allocated VDI
 
-## Host
+## 2. Physical Host
 
-- Hardware: ASUS ROG Strix G531GT
-- OS: Zorin OS 18.1
-- CPU: Intel Core i5-9300H
-- RAM: 15 GiB
+| Component | Configuration |
+|---|---|
+| Hardware | ASUS ROG Strix G531GT |
+| OS | Zorin OS 18.1 |
+| CPU | Intel Core i5-9300H |
+| Physical cores | 4 |
+| Logical CPUs | 8 |
+| RAM | Approximately 15 GiB |
 
-## Guest
+Existing host services, including Nginx, Docker and Node Exporter,
+are preserved.
 
-- OS: Ubuntu Server 24.04 LTS
-- vCPU: 2 (proposed)
-- RAM: 3 GiB (proposed)
-- Storage: 35 GiB QCOW2 is not used;
-  VirtualBox native VDI format will be used.
+## 3. Virtual Machine
 
-## Virtualization Components
+| Component | Configuration |
+|---|---|
+| VM name | devops-assessment-vm |
+| Guest OS | Ubuntu Server 24.04.5 LTS |
+| CPU | 2 vCPU |
+| RAM | 3072 MB |
+| Virtual disk | 35 GiB |
+| Disk format | VDI |
+| Allocation | Dynamically allocated |
+| Hostname | devops-vm |
+| User | devopsadmin |
 
-- Hypervisor: Oracle VM VirtualBox
-- Management: VirtualBox Manager
-- CLI: VBoxManage
-- Guest Additions: Only if required
+## 4. Network Design
 
-## Networking
+Two VirtualBox adapters are configured.
 
-Preferred:
-- Bridged Adapter over Wi-Fi, subject to testing.
+### Adapter 1 — NAT
 
-Fallback:
-- NAT with static guest configuration
-  and controlled port forwarding.
+Provides outbound internet connectivity.
 
-## Web Infrastructure
+- Guest interface: enp0s3
+- Guest address: 10.0.2.15
+- Gateway: 10.0.2.2
+- Address assignment: DHCP
 
-- Nginx
-- Certbot
-- Let's Encrypt
-- UFW
+### Adapter 2 — Host-only
 
-## Version Control
+Provides stable host-to-VM management connectivity.
 
-Git and GitHub.
+- Guest interface: enp0s8
+- Host interface: vboxnet0
+- Host address: 192.168.56.1
+- Guest address: 192.168.56.10
+- Subnet: 192.168.56.0/24
+- Guest address assignment: Static
 
-## Security
+The host-only interface is used for SSH and private management.
+The NAT interface is used for outbound internet connectivity.
 
-- No production credentials.
-- No unnecessary exposed ports.
-- Private keys excluded from Git.
-- Host and guest services remain isolated.
+## 5. Application Architecture
+
+- Nginx listens on guest port 80.
+- Nginx forwards requests to 127.0.0.1:8000.
+- Python HTTP Server provides JSON responses.
+- The backend is managed by systemd.
+- The backend listens only on loopback.
+
+## 6. External Access
+
+Cloudflare Quick Tunnel publishes the Nginx HTTP origin through
+a temporary public HTTPS hostname.
+
+Traffic flow:
+
+Public HTTPS
+-> Cloudflare Edge
+-> Cloudflare Tunnel
+-> Ubuntu Nginx
+-> Python Backend
+
+The tunnel runs as a systemd service.
+
+## 7. Automatic Startup
+
+- VirtualBox VM automatic startup is enabled.
+- Nginx is enabled at boot.
+- Python backend is enabled at boot.
+- Cloudflare Quick Tunnel is enabled at boot.
+
+## 8. Security Considerations
+
+- The backend listens only on 127.0.0.1.
+- The VM is managed through a private host-only network.
+- No router ports were opened.
+- No custom domain or permanent public endpoint is configured.
+- Private credentials and secrets must not be committed to Git.

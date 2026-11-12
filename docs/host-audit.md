@@ -55,12 +55,9 @@ The available storage is sufficient for the proposed Ubuntu Server VM.
 | Component | Audit Result |
 |---|---|
 | QEMU | Installed |
-| KVM | Installed and loaded |
-| libvirt | Not installed |
-| virt-manager | Not installed |
-| virsh | Not installed |
-
-The next step is to install and configure libvirt and its management tools.
+VirtualBox was subsequently selected and installed as the project
+hypervisor. See `virtualbox-installation.md` for installation
+and verification details.
 
 ## 6. Network
 
@@ -95,20 +92,18 @@ Existing host services will be preserved.
 
 ## 9. Infrastructure Decision
 
-Selected virtualization architecture:
+The initial host audit identified KVM/QEMU as available and
+VirtualBox as not yet installed.
 
-- KVM
-- QEMU
-- libvirt
-- virt-manager
-- Ubuntu Server 24.04 LTS
+After evaluating the assessment requirements, Oracle VirtualBox
+was selected and installed.
 
-The final network design is pending verification of Ethernet availability,
-wireless bridging capabilities and router configuration.
+The implemented hypervisor is Oracle VM VirtualBox 7.2.22.
 
 ## 10. Security Considerations
 
-- No host firewall changes during audit.
-- No existing service configurations modified.
-- No credentials or private network identifiers committed.
-- VM services will be isolated from existing host services.
+- No host firewall changes were required.
+- Existing host Nginx, Docker and Node Exporter services were preserved.
+- The VM uses NAT and host-only networking.
+- No router port forwarding was configured.
+- Private credentials and secrets must not be committed to Git.

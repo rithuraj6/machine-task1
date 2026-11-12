@@ -1,3 +1,4 @@
+
 # VirtualBox Installation and Verification
 
 ## Installation
@@ -8,16 +9,9 @@
 - Host OS: Zorin OS 18.1
 - Host kernel: 7.0.0-42-generic
 
-## Installation Summary
-
-- Five new packages installed.
-- No packages removed.
-- No existing packages upgraded during VirtualBox installation.
-- VirtualBox installation completed successfully.
-
 ## Kernel Driver Verification
 
-The following modules were observed loaded:
+The following modules were loaded:
 
 - vboxdrv
 - vboxnetflt
@@ -25,29 +19,55 @@ The following modules were observed loaded:
 
 The device `/dev/vboxdrv` was present.
 
-## Hardware Virtualization
+## Host Hardware
 
 - CPU: Intel Core i5-9300H
 - Physical cores: 4
 - Logical processors: 8
 - Hardware virtualization: Supported
-- Host RAM: Approximately 15.5 GiB
-- Available RAM at verification: Approximately 6.9 GiB
+- Host RAM: Approximately 15 GiB
 
-## Planned Guest Configuration
+## Virtual Machine Configuration
 
-- Guest OS: Ubuntu Server 24.04 LTS
-- vCPU: 2
-- RAM: 3 GiB
-- Virtual disk: 35 GiB
-- Disk format: VDI
-- Allocation: Dynamically allocated
+| Parameter | Value |
+|---|---|
+| Name | devops-assessment-vm |
+| Guest OS | Ubuntu Server 24.04.5 LTS |
+| CPU | 2 vCPU |
+| RAM | 3072 MB |
+| Virtual disk | 35 GiB |
+| Disk format | VDI |
+| Allocation | Dynamically allocated |
+| Firmware | BIOS |
+
+## Networking
+
+- Adapter 1: NAT
+- Adapter 2: Host-only
+- Host-only network: 192.168.56.0/24
+- Host address: 192.168.56.1
+- Guest static address: 192.168.56.10
+
+## Automatic Startup
+
+VirtualBox autostart is configured through:
+
+- `vboxautostart-service.service`
+- `/etc/vbox/autostart.cfg`
+- `/etc/default/virtualbox`
+
+The VM was verified running after a host reboot.
+
+## Verification
+
+- VirtualBox installation: PASS
+- Kernel modules: PASS
+- VM startup: PASS
+- Host-only network: PASS
+- NAT connectivity: PASS
+- VM automatic startup: PASS
 
 ## Notes
 
-- DKMS is not installed. The VirtualBox driver modules were nevertheless
-  observed loaded, and `/dev/vboxdrv` was present.
-- The vboxusers group was created by the VirtualBox installation.
-- The current user was added to vboxusers.
-- Host-only networking has not yet been configured.
-- No existing host Nginx, Docker, or Kubernetes services were modified.
+No existing host Nginx, Docker or Kubernetes services were modified
+for this VirtualBox configuration.
