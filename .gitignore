@@ -1,0 +1,41 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# SSH and private configuration
+id_rsa
+id_ed25519
+*.kubeconfig
+
+# VM disks and snapshots
+*.qcow2
+*.raw
+*.vdi
+*.vmdk
+*.vma
+*.iso
+*.snap
+
+# Runtime data
+*.log
+*.pid
+*.sock
+*.swp
+*.tmp
+
+# Generated certificates
+letsencrypt/
+certbot/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
